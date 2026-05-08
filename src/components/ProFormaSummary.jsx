@@ -73,13 +73,14 @@ export default function ProFormaSummary({ profile, purchase, pitiBreakdown, rubr
       {/* PITI Breakdown */}
       <div className="bg-white/60 rounded-xl p-4 space-y-2">
         <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">
-          Monthly Payment Breakdown (PITI)
+          Monthly Payment Breakdown (PITIA)
         </p>
         {[
-          { label: 'Principal & Interest', value: pitiBreakdown.pi },
-          { label: 'Property Tax (est.)',  value: pitiBreakdown.tax },
-          { label: "Homeowner's Insurance", value: pitiBreakdown.insurance },
-          pitiBreakdown.pmi  > 0 && { label: 'PMI',                  value: pitiBreakdown.pmi },
+          { label: 'Principal & Interest',          value: pitiBreakdown.pi },
+          { label: 'Property Tax (est.)',            value: pitiBreakdown.tax },
+          { label: "Homeowner's Insurance",          value: pitiBreakdown.insurance },
+          pitiBreakdown.pmi  > 0 && { label: 'PMI',                          value: pitiBreakdown.pmi },
+          pitiBreakdown.hoa  > 0 && { label: 'HOA Fees',                     value: pitiBreakdown.hoa },
           pitiBreakdown.fundingFee > 0 && { label: 'VA Funding Fee (financed)', value: pitiBreakdown.fundingFee / 360, note: 'amortized' },
         ].filter(Boolean).map(({ label, value, note }) => (
           <div key={label} className="flex justify-between items-center text-sm">
@@ -100,7 +101,7 @@ export default function ProFormaSummary({ profile, purchase, pitiBreakdown, rubr
         </p>
         {[
           { label: 'Gross Monthly Income',          value: monthly,               sign: '+', color: '#10b981' },
-          { label: 'Housing (PITI)',                 value: -pitiBreakdown.total,  sign: '−', color: '#ef4444' },
+          { label: 'Housing (PITIA)',                value: -pitiBreakdown.total,  sign: '−', color: '#ef4444' },
           { label: 'Existing Debt Payments',         value: -profile.monthlyDebt,  sign: '−', color: '#ef4444' },
           { label: 'Living Expenses (est. 50%)',     value: -(budget.needs * 0.5), sign: '−', color: '#f59e0b' },
         ].map(({ label, value, sign, color }) => (

@@ -3,6 +3,7 @@ import { useLocalStorage } from './hooks/useLocalStorage'
 import Sidebar from './components/Sidebar'
 import Dashboard from './components/Dashboard'
 import RealEstateModule from './components/RealEstateModule'
+import RentVsBuy from './components/RentVsBuy'
 import SinkingFundCalculator from './components/SinkingFundCalculator'
 import FinancialProfile from './components/FinancialProfile'
 import { fmt } from './utils/formatters'
@@ -15,10 +16,11 @@ const DEFAULT_PROFILE = {
 }
 
 const VIEW_LABELS = {
-  dashboard:    'Financial Health',
+  dashboard:     'Financial Health',
   'real-estate': 'Real Estate Analyzer',
-  'sinking-fund': 'Sinking Fund',
-  profile:      'Profile Setup',
+  'rent-vs-buy': 'Rent vs. Buy Analyzer',
+  'sinking-fund':'Sinking Fund',
+  profile:       'Profile Setup',
 }
 
 export default function App() {
@@ -70,6 +72,9 @@ export default function App() {
           )}
           {activeView === 'real-estate' && (
             <RealEstateModule profile={profile} />
+          )}
+          {activeView === 'rent-vs-buy' && (
+            <RentVsBuy profile={profile} />
           )}
           {activeView === 'sinking-fund' && (
             <SinkingFundCalculator profile={profile} />

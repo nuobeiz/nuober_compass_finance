@@ -16,6 +16,7 @@ const DEFAULT_PURCHASE = {
   isVALoan:       false,
   isFirstVAUse:   true,
   familySize:     4,
+  hoaMonthly:     0,
 }
 
 function Slider({ label, value, onChange, min, max, step, format, sublabel }) {
@@ -164,6 +165,14 @@ export default function RealEstateModule({ profile }) {
               min={2} max={12} step={0.125}
               format={(v) => `${v.toFixed(3)}%`}
             />
+            <Slider
+              label="HOA Fees"
+              value={purchase.hoaMonthly}
+              onChange={set('hoaMonthly')}
+              min={0} max={1500} step={25}
+              format={(v) => v === 0 ? 'None' : `${fmt.currency(v)}/mo`}
+              sublabel="Included in DTI calculations"
+            />
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-700">Loan Term</label>
               <div className="flex gap-2">
@@ -184,14 +193,15 @@ export default function RealEstateModule({ profile }) {
             </div>
           </div>
 
-          {/* Live PITI card */}
+          {/* Live PITI + HOA card */}
           <div className="bg-slate-900 rounded-2xl p-5 text-white space-y-3">
-            <p className="text-xs text-slate-400 uppercase tracking-wide font-medium">Live PITI Estimate</p>
+            <p className="text-xs text-slate-400 uppercase tracking-wide font-medium">Live PITIA Estimate</p>
             {[
               { label: 'Principal & Interest', val: pitiBreakdown.pi },
               { label: 'Property Tax',         val: pitiBreakdown.tax },
               { label: 'Insurance',            val: pitiBreakdown.insurance },
-              ...(pitiBreakdown.pmi > 0 ? [{ label: 'PMI', val: pitiBreakdown.pmi }] : []),
+              ...(pitiBreakdown.pmi > 0 ? [{ label: 'PMI',      val: pitiBreakdown.pmi }] : []),
+              ...(pitiBreakdown.hoa > 0 ? [{ label: 'HOA Fees', val: pitiBreakdown.hoa }] : []),
             ].map(({ label, val }) => (
               <div key={label} className="flex justify-between text-sm">
                 <span className="text-slate-400">{label}</span>
@@ -199,7 +209,7 @@ export default function RealEstateModule({ profile }) {
               </div>
             ))}
             <div className="border-t border-white/10 pt-3 flex justify-between items-baseline">
-              <span className="font-bold text-white">Total PITI</span>
+              <span className="font-bold text-white">Total Monthly</span>
               <span className="text-xl font-black text-indigo-300">{fmt.currency(pitiBreakdown.total)}/mo</span>
             </div>
           </div>

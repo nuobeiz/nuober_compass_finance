@@ -24,8 +24,8 @@ export function calcVAFundingFee(loanAmount, downPct, isFirstUse = true) {
   return loanAmount * rate
 }
 
-// Full PITI breakdown
-export function calcPITI({ purchasePrice, downPaymentPct, interestRate, termYears, isVALoan, isFirstVAUse }) {
+// Full PITI + HOA breakdown
+export function calcPITI({ purchasePrice, downPaymentPct, interestRate, termYears, isVALoan, isFirstVAUse, hoaMonthly = 0 }) {
   const downPayment = purchasePrice * (downPaymentPct / 100)
   let baseLoan = purchasePrice - downPayment
   let fundingFee = 0
@@ -39,9 +39,74 @@ export function calcPITI({ purchasePrice, downPaymentPct, interestRate, termYear
   const tax       = calcPropertyTax(purchasePrice)
   const insurance = calcInsurance(purchasePrice)
   const pmi       = isVALoan ? 0 : calcPMI(baseLoan, downPaymentPct)
-  const total     = pi + tax + insurance + pmi
+  const hoa       = hoaMonthly
+  const total     = pi + tax + insurance + pmi + hoa
 
-  return { pi, tax, insurance, pmi, total, baseLoan, downPayment, fundingFee }
+  return { pi, tax, insurance, pmi, hoa, total, baseLoan, downPayment, fundingFee }
+}
+
+// Remaining mortgage balance after `paymentsMade` monthly payments
+export function calcRemainingBalance(loanAmount, annualRate, termYears, paymentsMade) {
+  if (paymentsMade >= termYears * 12) return 0
+  if (annualRate === 0) return loanAmount * (1 - paymentsMade / (termYears * 12))
+  const r = annualRate / 100 / 12
+  const n = termYears * 12
+  const p = paymentsMade
+  return loanAmount * (Math.pow(1 + r, n) - Math.pow(1 + r, p)) / (Math.pow(1 + r, n) - 1)
+}
+
+// ── Rent vs. Buy Simulator ──────────────────────────────────────────────────────
+// Model: renter invests (down payment + closing costs) in stocks at t=0.
+// Each month the net contribution to the renter's portfolio is:
+//   (total buy cost) − (monthly rent)
+// Positive → renter invests the savings; Negative → renter draws portfolio to cover extra rent.
+// Buyer's wealth = home equity (appreciated value − remaining mortgage).
+export function calcRentVsBuyData(purchase, settings) {
+  const { monthlyRent, stockReturn, homeAppreciation, timeHorizon, maintenancePct } = settings
+
+  const piti = calcPITI(purchase)
+  const maintenanceMonthly = purchase.purchasePrice * (maintenancePct / 100) / 12
+  const closingCosts       = calcClosingCosts(purchase.purchasePrice)
+  const initialInvestment  = piti.downPayment + closingCosts
+
+  const r = stockReturn / 100 / 12   // monthly stock rate
+  let renterPortfolio = initialInvestment
+  const data = []
+
+  for (let month = 1; month <= timeHorizon * 12; month++) {
+    renterPortfolio *= (1 + r)
+
+    const isPaidOff = month > purchase.termYears * 12
+    // Post-payoff: no more P&I or PMI; tax + insurance + HOA + maintenance remain
+    const monthlyBuyCost = isPaidOff
+      ? piti.tax + piti.insurance + piti.hoa + maintenanceMonthly
+      : piti.total + maintenanceMonthly
+
+    renterPortfolio += monthlyBuyCost - monthlyRent
+    renterPortfolio = Math.max(0, renterPortfolio)
+
+    if (month % 12 === 0) {
+      const year          = month / 12
+      const homeValue     = purchase.purchasePrice * Math.pow(1 + homeAppreciation / 100, year)
+      const remainingBal  = calcRemainingBalance(piti.baseLoan, purchase.interestRate, purchase.termYears, month)
+      const buyerEquity   = Math.max(0, homeValue - remainingBal)
+      data.push({ year, buyerEquity, renterPortfolio, homeValue, remainingBal })
+    }
+  }
+
+  const breakEvenYear = data.find(d => d.buyerEquity >= d.renterPortfolio)?.year ?? null
+  const atHorizon     = data[data.length - 1] ?? { buyerEquity: 0, renterPortfolio: 0 }
+
+  return {
+    data,
+    breakEvenYear,
+    piti,
+    maintenanceMonthly,
+    closingCosts,
+    initialInvestment,
+    atHorizon,
+    totalBuyCost: piti.total + maintenanceMonthly,
+  }
 }
 
 // ── Budget & Ratios ─────────────────────────────────────────────────────────────

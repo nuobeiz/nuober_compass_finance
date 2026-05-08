@@ -1,12 +1,13 @@
 import React from 'react'
 import {
   LayoutDashboard, Building2, PiggyBank, Settings, ChevronLeft,
-  ChevronRight, Zap,
+  ChevronRight, Zap, Scale,
 } from 'lucide-react'
 
 const NAV = [
   { id: 'dashboard',    label: 'Financial Health',  icon: LayoutDashboard },
   { id: 'real-estate',  label: 'Real Estate',        icon: Building2 },
+  { id: 'rent-vs-buy',  label: 'Rent vs. Buy',       icon: Scale },
   { id: 'sinking-fund', label: 'Sinking Fund',       icon: PiggyBank },
   { id: 'profile',      label: 'Profile Setup',      icon: Settings },
 ]
