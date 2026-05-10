@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Compass Finance — Team Presentation</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --indigo:   #4f46e5; --indigo-l: #6366f1; --indigo-ll: #e0e7ff;
+    --emerald:  #10b981; --emerald-l: #d1fae5;
+    --amber:    #f59e0b; --amber-l:  #fef3c7;
+    --violet:   #7c3aed; --violet-l: #ede9fe;
+    --slate-50: #f8fafc; --slate-100:#f1f5f9; --slate-200:#e2e8f0;
+    --slate-400:#94a3b8; --slate-500:#64748b; --slate-700:#334155; --slate-800:#1e293b; --slate-900:#0f172a;
+  }
+
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+         background: var(--slate-900); color: var(--slate-900); height: 100vh; overflow: hidden; }
+
+  .deck { width: 100vw; height: 100vh; position: relative; }
+
+  .slide { position: absolute; inset: 0; display: none; flex-direction: column;
+           padding: 52px 68px; opacity: 0; transition: opacity .3s ease; }
+  .slide.active { display: flex; opacity: 1; }
+
+  .bg-dark   { background: var(--slate-900); color: #fff; }
+  .bg-light  { background: var(--slate-50);  color: var(--slate-900); }
+  .bg-indigo { background: linear-gradient(135deg,#1e1b4b 0%,#312e81 50%,#4338ca 100%); color:#fff; }
+
+  /* typography */
+  .tag  { font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; opacity:.5; margin-bottom:10px; }
+  h1    { font-size:50px; font-weight:900; line-height:1.08; letter-spacing:-.02em; }
+  h2    { font-size:34px; font-weight:800; line-height:1.15; letter-spacing:-.01em; }
+  h3    { font-size:20px; font-weight:700; }
+  h4    { font-size:15px; font-weight:700; }
+  p,li  { font-size:14px; line-height:1.6; }
+  .muted { opacity:.55; }
+
+  /* layout */
+  .row  { display:flex; gap:20px; }
+  .col  { display:flex; flex-direction:column; }
+  .flex1{ flex:1; }
+  .center { align-items:center; justify-content:center; text-align:center; }
+
+  /* cards */
+  .card        { background:#fff; border-radius:14px; padding:18px 22px;
+                 border:1px solid var(--slate-200); box-shadow:0 1px 6px rgba(0,0,0,.06); }
+  .card-dark   { background:rgba(255,255,255,.07); border-radius:14px; padding:18px 22px;
+                 border:1px solid rgba(255,255,255,.1); }
+  .card-indigo { background:rgba(99,102,241,.15); border-radius:14px; padding:18px 22px;
+                 border:1px solid rgba(99,102,241,.35); }
+
+  /* stat */
+  .stat .num { font-size:44px; font-weight:900; letter-spacing:-.02em; line-height:1; }
+  .stat .lbl { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.1em; opacity:.5; margin-top:6px; }
+
+  /* pill */
+  .pill         { display:inline-flex; font-size:11px; font-weight:700; padding:3px 10px; border-radius:999px; }
+  .pill-indigo  { background:var(--indigo-ll); color:var(--indigo); }
+  .pill-emerald { background:var(--emerald-l); color:#047857; }
+  .pill-amber   { background:var(--amber-l);   color:#92400e; }
+
+  /* module card */
+  .mod { flex:1; border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:8px; }
+  .mod h4 { font-size:15px; font-weight:800; }
+  .mod p  { font-size:12px; opacity:.7; line-height:1.5; }
+
+  /* code */
+  .code { font-family:'SF Mono','Fira Code','Consolas',monospace; font-size:12px; line-height:1.7;
+          background:rgba(0,0,0,.35); border-radius:10px; padding:14px 18px;
+          border:1px solid rgba(255,255,255,.08); white-space:pre; color:#e2e8f0; }
+  .code-light { font-family:'SF Mono','Fira Code','Consolas',monospace; font-size:12px; line-height:1.7;
+                background:var(--slate-100); border-radius:10px; padding:14px 18px;
+                border:1px solid var(--slate-200); white-space:pre; color:var(--slate-700); }
+
+  /* missing item row */
+  .miss-item { display:flex; gap:12px; align-items:flex-start; margin-bottom:14px; }
+  .miss-num  { width:22px; height:22px; border-radius:6px; background:rgba(99,102,241,.3);
+               display:flex; align-items:center; justify-content:center;
+               font-size:11px; font-weight:800; color:#a5b4fc; flex-shrink:0; margin-top:2px; }
+  .miss-text { font-size:13px; color:rgba(255,255,255,.65); line-height:1.5; }
+
+  /* contribution item */
+  .contrib-item { display:flex; gap:12px; align-items:flex-start; margin-bottom:14px; }
+  .contrib-icon { font-size:18px; flex-shrink:0; margin-top:1px; }
+  .contrib-title { font-size:14px; font-weight:700; color:var(--slate-800); margin-bottom:2px; }
+  .contrib-desc  { font-size:12px; color:var(--slate-500); line-height:1.5; }
+
+  /* metric grid */
+  .metric-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .metric-cell { background:rgba(255,255,255,.07); border-radius:12px; padding:13px 15px;
+                 border:1px solid rgba(255,255,255,.08); }
+  .metric-name { font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+                 color:rgba(255,255,255,.35); margin-bottom:5px; }
+  .metric-eq   { font-family:'SF Mono','Fira Code',monospace; font-size:11px; color:#a5b4fc;
+                 line-height:1.5; margin-bottom:7px; }
+  .metric-thr  { font-size:11px; font-weight:700; padding:2px 8px; border-radius:5px;
+                 background:rgba(255,255,255,.07); display:inline-block; }
+
+  /* tech stack grid */
+  .tech-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .tech-cell { background:rgba(255,255,255,.07); border-radius:12px; padding:13px 15px;
+               border:1px solid rgba(255,255,255,.08); }
+  .tech-emoji { font-size:22px; margin-bottom:5px; }
+  .tech-name  { font-size:14px; font-weight:700; color:#fff; margin-bottom:2px; }
+  .tech-desc  { font-size:11px; opacity:.5; }
+
+  /* reg row */
+  .reg-row { display:flex; justify-content:space-between; gap:12px;
+             padding:8px 0; border-bottom:1px solid var(--slate-100); }
+  .reg-row:last-child { border-bottom:none; }
+  .reg-rule { font-size:13px; font-weight:700; color:var(--indigo); }
+  .reg-src  { font-size:11px; color:var(--slate-400); text-align:right; flex-shrink:0; }
+
+  /* session row */
+  .sess-row { display:grid; grid-template-columns:auto 1fr auto; gap:6px 18px;
+              align-items:center; padding:7px 0; border-bottom:1px solid rgba(255,255,255,.07); }
+  .sess-row:last-child { border-bottom:none; }
+  .sess-title { font-size:13px; font-weight:700; color:rgba(255,255,255,.8); }
+  .sess-desc  { font-size:11px; color:rgba(255,255,255,.4); }
+  .sess-tok   { font-size:12px; font-weight:700; color:#a5b4fc; white-space:nowrap; }
+
+  /* roadmap card */
+  .road-card { background:#fff; border-radius:12px; padding:14px 18px; margin-bottom:12px;
+               border-left:4px solid var(--indigo); border-top:1px solid var(--slate-200);
+               border-right:1px solid var(--slate-200); border-bottom:1px solid var(--slate-200); }
+  .road-card.green { border-left-color: var(--emerald); }
+  .road-title { font-size:14px; font-weight:700; color:var(--slate-800); margin-bottom:3px; }
+  .road-desc  { font-size:12px; color:var(--slate-500); line-height:1.5; }
+  .road-emoji { font-size:20px; margin-bottom:6px; }
+
+  /* nav */
+  .progress-bar { position:fixed; bottom:26px; left:50%; transform:translateX(-50%);
+                  display:flex; gap:6px; z-index:100; }
+  .dot    { width:7px; height:7px; border-radius:50%; background:rgba(255,255,255,.25);
+            cursor:pointer; transition:all .2s; }
+  .dot.on { background:#fff; transform:scale(1.3); }
+  .nav    { position:fixed; bottom:22px; right:34px; display:flex; gap:8px; z-index:100; }
+  .nav button { width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,.12);
+                border:1px solid rgba(255,255,255,.2); color:#fff; font-size:15px; cursor:pointer;
+                display:flex; align-items:center; justify-content:center; transition:background .2s; }
+  .nav button:hover { background:rgba(255,255,255,.25); }
+  .counter { position:fixed; bottom:30px; left:34px; font-size:12px; font-weight:600;
+             color:rgba(255,255,255,.3); z-index:100; }
+
+  /* logomark */
+  .logomark { width:52px; height:52px; border-radius:14px;
+              background:linear-gradient(135deg,var(--indigo-l),var(--violet));
+              display:flex; align-items:center; justify-content:center; font-size:26px; flex-shrink:0; }
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 1 — TITLE                                   -->
+<!-- ══════════════════════════════════════════════════ -->
+<div class="slide bg-indigo active" id="s1">
+  <div class="row" style="align-items:center;gap:14px;margin-bottom:44px;">
+    <div class="logomark">⚡</div>
+    <div>
+      <div style="font-size:13px;font-weight:700;opacity:.5;letter-spacing:.1em;">COMPASS FINANCE</div>
+      <div style="font-size:11px;opacity:.35;">Strategic Purchase &amp; Decision Engine</div>
+    </div>
+  </div>
+
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;">
+    <div class="tag" style="color:rgba(255,255,255,.45);">Team Presentation · 2026</div>
+    <h1 style="color:#fff;max-width:680px;margin-bottom:22px;">
+      Building a FinTech<br/>Decision Engine<br/><span style="color:#a5b4fc;">with AI</span>
+    </h1>
+    <p style="font-size:17px;color:rgba(255,255,255,.55);max-width:520px;line-height:1.6;">
+      How one developer used Claude to design, architect, and ship a full real-estate and purchase decision tool — in a single session.
+    </p>
+  </div>
+
+  <div class="row" style="gap:36px;padding-top:28px;border-top:1px solid rgba(255,255,255,.1);">
+    <div class="stat"><span class="num" style="color:#a5b4fc;">23</span><span class="lbl" style="color:rgba(255,255,255,.4);">Source files</span></div>
+    <div class="stat"><span class="num" style="color:#6ee7b7;">~6k</span><span class="lbl" style="color:rgba(255,255,255,.4);">Lines of code</span></div>
+    <div class="stat"><span class="num" style="color:#fcd34d;">~3 hrs</span><span class="lbl" style="color:rgba(255,255,255,.4);">Human time</span></div>
+    <div class="stat"><span class="num" style="color:#f9a8d4;">~63k</span><span class="lbl" style="color:rgba(255,255,255,.4);">Tokens used</span></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 2 — THE PROBLEM                             -->
+<!-- ══════════════════════════════════════════════════ -->
+<div class="slide bg-dark" id="s2">
+  <div class="tag" style="color:rgba(255,255,255,.4);">The Problem</div>
+  <h2 style="color:#fff;margin-bottom:28px;max-width:560px;">"Can I afford this?" is the wrong question.</h2>
+
+  <div class="row" style="flex:1;gap:24px;">
+    <div class="col flex1" style="gap:14px;">
+      <div class="card-dark">
+        <div style="font-size:22px;margin-bottom:8px;">🏦</div>
+        <h4 style="color:#fff;margin-bottom:5px;">Banks only check if you qualify</h4>
+        <p style="color:rgba(255,255,255,.5);">Lender approval doesn't mean the purchase is strategically sound for your full financial picture.</p>
+      </div>
+      <div class="card-dark">
+        <div style="font-size:22px;margin-bottom:8px;">📊</div>
+        <h4 style="color:#fff;margin-bottom:5px;">Spreadsheets are static</h4>
+        <p style="color:rgba(255,255,255,.5);">No real-time feedback, no rubric system, no live connection between your profile and each decision.</p>
+      </div>
+      <div class="card-dark">
+        <div style="font-size:22px;margin-bottom:8px;">🤔</div>
+        <h4 style="color:#fff;margin-bottom:5px;">Rent vs. Buy intuition fails</h4>
+        <p style="color:rgba(255,255,255,.5);">Most people compare monthly cost only — ignoring the opportunity cost of the down payment sitting outside equity markets.</p>
+      </div>
+    </div>
+
+    <div class="flex1" style="display:flex;align-items:center;">
+      <div style="background:rgba(255,255,255,.04);border-radius:18px;padding:28px;border:1px solid rgba(255,255,255,.08);width:100%;">
+        <div class="tag" style="color:rgba(255,255,255,.4);margin-bottom:18px;">What was missing</div>
+
+        <div class="miss-item">
+          <div class="miss-num">1</div>
+          <div class="miss-text">A single tool that cross-references income, savings, debt, and credit score against any purchase in real time.</div>
+        </div>
+        <div class="miss-item">
+          <div class="miss-num">2</div>
+          <div class="miss-text">Rules grounded in actual underwriting standards — not generic "afford 3× income" rules of thumb.</div>
+        </div>
+        <div class="miss-item">
+          <div class="miss-num">3</div>
+          <div class="miss-text">A fair Rent vs. Buy model that prices the true opportunity cost of locking capital in a down payment.</div>
+        </div>
+        <div class="miss-item" style="margin-bottom:0;">
+          <div class="miss-num">4</div>
+          <div class="miss-text">Persistent state so a financial analysis can be built incrementally — not re-entered from scratch every session.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 3 — WHAT WAS BUILT                          -->
+<!-- ══════════════════════════════════════════════════ -->
+<div class="slide bg-light" id="s3">
+  <div class="tag" style="color:var(--slate-400);">The Solution</div>
+  <h2 style="margin-bottom:6px;">Four modules. One financial profile.</h2>
+  <p class="muted" style="margin-bottom:28px;font-size:13px;">All modules share a global FinancialProfile — a change in income or savings propagates to every rubric instantly.</p>
+
+  <div class="row" style="flex:1;gap:14px;">
+    <div class="mod" style="background:var(--indigo-ll);border:1.5px solid #c7d2fe;">
+      <div style="font-size:26px;">📊</div>
+      <h4 style="color:var(--indigo);">Financial Health Dashboard</h4>
+      <p style="color:var(--indigo);">Composite health score (0–100), DTI radial gauges, 50/30/20 budget donut, savings-vs-emergency bar chart.</p>
+      <div style="margin-top:auto;"><span class="pill pill-indigo">Recharts</span></div>
+    </div>
+    <div class="mod" style="background:var(--emerald-l);border:1.5px solid #a7f3d0;">
+      <div style="font-size:26px;">🏠</div>
+      <h4 style="color:#065f46;">Real Estate Analyzer</h4>
+      <p style="color:#065f46;">Live PITIA sandbox. 5 affordability rubrics + 2 VA-specific rubrics. Pro-Forma cash-flow waterfall with editable living expenses.</p>
+      <div style="margin-top:auto;"><span class="pill pill-emerald">VA Loan Support</span></div>
+    </div>
+    <div class="mod" style="background:var(--violet-l);border:1.5px solid #ddd6fe;">
+      <div style="font-size:26px;">⚖️</div>
+      <h4 style="color:#5b21b6;">Rent vs. Buy Analyzer</h4>
+      <p style="color:#5b21b6;">Month-by-month opportunity cost simulation. Stock portfolio vs. home equity. Break-even year, milestone table, wealth trajectory chart.</p>
+      <div style="margin-top:auto;"><span class="pill" style="background:#ede9fe;color:#5b21b6;">Adjustable Returns</span></div>
+    </div>
+    <div class="mod" style="background:var(--amber-l);border:1.5px solid #fde68a;">
+      <div style="font-size:26px;">🐷</div>
+      <h4 style="color:#92400e;">Sinking Fund Calculator</h4>
+      <p style="color:#92400e;">Goal-based saving planner pulling from the 30% "Wants" budget. Multi-goal timeline chart with projected target dates.</p>
+      <div style="margin-top:auto;"><span class="pill pill-amber">50/30/20 Linked</span></div>
+    </div>
+  </div>
+
+  <div class="row" style="margin-top:18px;gap:14px;">
+    <div class="card flex1 row" style="gap:12px;align-items:center;padding:12px 18px;">
+      <span style="font-size:18px;">💾</span>
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--slate-500);text-transform:uppercase;letter-spacing:.08em;">Persistent State</div>
+        <div style="font-size:12px;color:var(--slate-700);">Custom <code style="background:var(--slate-100);padding:1px 5px;border-radius:4px;">useLocalStorage</code> hook — no data lost on refresh</div>
+      </div>
+    </div>
+    <div class="card flex1 row" style="gap:12px;align-items:center;padding:12px 18px;">
+      <span style="font-size:18px;">⚙️</span>
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--slate-500);text-transform:uppercase;letter-spacing:.08em;">Architecture</div>
+        <div style="font-size:12px;color:var(--slate-700);">JSON-driven rubric engine — rules are config objects, not hard-coded logic</div>
+      </div>
+    </div>
+    <div class="card flex1 row" style="gap:12px;align-items:center;padding:12px 18px;">
+      <span style="font-size:18px;">🚀</span>
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--slate-500);text-transform:uppercase;letter-spacing:.08em;">Deployment</div>
+        <div style="font-size:12px;color:var(--slate-700);">Vercel CI/CD — auto-deploys on every push to main</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 4 — THE MATH                                -->
+<!-- ══════════════════════════════════════════════════ -->
+<div class="slide bg-dark" id="s4">
+  <div class="tag" style="color:rgba(255,255,255,.4);">Under the Hood</div>
+  <h2 style="color:#fff;margin-bottom:24px;">Key equations powering the engine</h2>
+
+  <div class="row" style="flex:1;gap:20px;">
+    <div class="col flex1" style="gap:14px;">
+      <div class="card-dark">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:8px;">Monthly Mortgage Payment</div>
+        <div class="code">M = P × r(1+r)ⁿ / [(1+r)ⁿ − 1]
+
+P = loan amount
+r = annual rate / 12
+n = term × 12</div>
+      </div>
+      <div class="card-dark">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:8px;">Remaining Balance (Rent vs. Buy)</div>
+        <div class="code">B(p) = P × [(1+r)ⁿ − (1+r)ᵖ]
+          / [(1+r)ⁿ − 1]
+
+p = payments already made</div>
+      </div>
+      <div class="card-dark">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:8px;">Renter Portfolio — Month by Month</div>
+        <div class="code">port(m) = port(m−1) × (1 + r_stock)
+        + [buyCost(m) − rent]
+
+Seed = down payment + closing costs</div>
+      </div>
+    </div>
+
+    <div class="flex1">
+      <div class="metric-grid">
+        <div class="metric-cell">
+          <div class="metric-name">Front-End DTI</div>
+          <div class="metric-eq">PITIA / Income × 100</div>
+          <div class="metric-thr" style="color:#6ee7b7;">≤ 28%</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-name">Back-End DTI</div>
+          <div class="metric-eq">(PITIA + Debts) / Income × 100</div>
+          <div class="metric-thr" style="color:#6ee7b7;">≤ 36%</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-name">Price-to-Income</div>
+          <div class="metric-eq">Purchase Price / Annual Income</div>
+          <div class="metric-thr" style="color:#fcd34d;">≤ 4.0×</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-name">Emergency Cover</div>
+          <div class="metric-eq">Savings After Close / Monthly Exp</div>
+          <div class="metric-thr" style="color:#fcd34d;">≥ 3 months</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-name">VA Residual Income</div>
+          <div class="metric-eq">Net Income − PITIA − Debts</div>
+          <div class="metric-thr" style="color:#a5b4fc;">≥ $1,025/mo</div>
+        </div>
+        <div class="metric-cell">
+          <div class="metric-name">Health Score</div>
+          <div class="metric-eq">Credit + DTI + Reserves + Savings</div>
+          <div class="metric-thr" style="color:#f9a8d4;">0 – 100 pts</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 5 — MARKET DATA & ASSUMPTIONS               -->
+<!-- ══════════════════════════════════════════════════ -->
+<div class="slide bg-light" id="s5">
+  <div class="tag" style="color:var(--slate-400);">Data Sources</div>
+  <h2 style="margin-bottom:24px;">Historical data &amp; regulatory standards</h2>
+
+  <div class="row" style="flex:1;gap:20px;">
+    <div class="col flex1" style="gap:14px;">
+      <div class="card" style="border-left:4px solid var(--indigo);">
+        <h4 style="margin-bottom:10px;">📈 Equity Market Returns</h4>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;">
+          <span style="font-size:13px;color:var(--slate-500);">S&amp;P 500 nominal avg (1928–2023)</span>
+          <span style="font-weight:800;color:var(--indigo);font-size:18px;">~10%/yr</span>
+        </div>
+        <div style="font-size:11px;color:var(--slate-400);margin-bottom:8px;">Real avg ≈ 6.8%/yr · Source: Shiller, JP Morgan, Vanguard</div>
+        <span class="pill pill-indigo">App default: 10% nominal (adjustable 1–20%)</span>
+      </div>
+      <div class="card" style="border-left:4px solid var(--emerald);">
+        <h4 style="margin-bottom:10px;">🏘️ Home Price Appreciation</h4>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;">
+          <span style="font-size:13px;color:var(--slate-500);">Case-Shiller national avg (1987–2023)</span>
+          <span style="font-weight:800;color:var(--emerald);font-size:18px;">~4.3%/yr</span>
+        </div>
+        <div style="font-size:11px;color:var(--slate-400);margin-bottom:8px;">Real avg ≈ 1.5%/yr · Source: S&amp;P CoreLogic, FHFA HPI, FRED</div>
+        <span class="pill pill-emerald">App default: 4% nominal (adjustable 0–10%)</span>
+      </div>
+      <div class="card" style="border-left:4px solid var(--amber);">
+        <h4 style="margin-bottom:10px;">🏠 Property Carrying Cost Rates</h4>
+        <div style="display:grid;grid-template-columns:1fr auto;gap:4px 16px;font-size:12px;">
+          <span style="color:var(--slate-500);">Property Tax</span>         <span style="font-weight:700;">1.1% of value/yr (ATTOM 2023)</span>
+          <span style="color:var(--slate-500);">Homeowner's Insurance</span> <span style="font-weight:700;">0.5% of value/yr (NAIC 2022)</span>
+          <span style="color:var(--slate-500);">PMI (if &lt;20% down)</span>  <span style="font-weight:700;">0.7% of loan/yr (Urban Institute)</span>
+          <span style="color:var(--slate-500);">Closing Costs</span>         <span style="font-weight:700;">3% of price (CFPB midpoint)</span>
+          <span style="color:var(--slate-500);">Annual Maintenance</span>    <span style="font-weight:700;">1% of price/yr ("1% Rule")</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col flex1" style="gap:14px;">
+      <div class="card">
+        <h4 style="margin-bottom:12px;">📋 Regulatory Standards Used</h4>
+        <div class="reg-row">
+          <span class="reg-rule">28% Front-End DTI</span>
+          <span class="reg-src">Fannie Mae / Freddie Mac Selling Guide</span>
+        </div>
+        <div class="reg-row">
+          <span class="reg-rule">36% Back-End DTI (conv.)</span>
+          <span class="reg-src">Fannie Mae standard; FHA allows 43%</span>
+        </div>
+        <div class="reg-row">
+          <span class="reg-rule">43% QM hard cap</span>
+          <span class="reg-src">CFPB 12 CFR Part 1026</span>
+        </div>
+        <div class="reg-row">
+          <span class="reg-rule">VA Residual Income Table</span>
+          <span class="reg-src">38 CFR § 36.4340, Table 41A</span>
+        </div>
+        <div class="reg-row">
+          <span class="reg-rule">VA Funding Fee 2.15%</span>
+          <span class="reg-src">38 CFR § 36.4312 (first use, 0% down)</span>
+        </div>
+        <div class="reg-row">
+          <span class="reg-rule">3–6 month reserve guideline</span>
+          <span class="reg-src">CFPB, HUD, Fannie Mae B3-4.3-04</span>
+        </div>
+        <div class="reg-row">
+          <span class="reg-rule">Price-to-Income ≤ 3–4×</span>
+          <span class="reg-src">Harvard JCHS; CFP Board guidance</span>
+        </div>
+      </div>
+      <div class="card" style="background:var(--slate-50);">
+        <h4 style="margin-bottom:8px;">🧮 Post-Tax Income Approximation</h4>
+        <p style="font-size:12px;color:var(--slate-500);margin-bottom:10px;">
+          22% effective rate based on IRS Statistics of Income data for $50k–$150k earners.
+        </p>
+        <div class="code-light">Net Monthly = (Annual Income / 12) × 0.78</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 6 — TECH STACK & ARCHITECTURE               -->
+<!-- ══════════════════════════════════════════════════ -->
+<div class="slide bg-dark" id="s6">
+  <div class="tag" style="color:rgba(255,255,255,.4);">Architecture</div>
+  <h2 style="color:#fff;margin-bottom:24px;">Tech stack &amp; design decisions</h2>
+
+  <div class="row" style="flex:1;gap:22px;">
+    <div class="col" style="flex:1.1;gap:14px;">
+      <div class="tech-grid">
+        <div class="tech-cell"><div class="tech-emoji">⚛️</div><div class="tech-name">React 18</div><div class="tech-desc">UI layer + component tree</div></div>
+        <div class="tech-cell"><div class="tech-emoji">⚡</div><div class="tech-name">Vite 5</div><div class="tech-desc">Sub-second HMR build tool</div></div>
+        <div class="tech-cell"><div class="tech-emoji">🎨</div><div class="tech-name">Tailwind CSS 3</div><div class="tech-desc">Utility-first styling</div></div>
+        <div class="tech-cell"><div class="tech-emoji">📈</div><div class="tech-name">Recharts 2</div><div class="tech-desc">Financial chart library</div></div>
+        <div class="tech-cell"><div class="tech-emoji">🔷</div><div class="tech-name">Lucide React</div><div class="tech-desc">Consistent icon set</div></div>
+        <div class="tech-cell"><div class="tech-emoji">💾</div><div class="tech-name">localStorage</div><div class="tech-desc">Persistent client-side state</div></div>
+      </div>
+    </div>
+    <div class="col flex1" style="gap:14px;">
+      <div class="card-dark">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:10px;">Rubric Contract — The Engine Core</div>
+        <div class="code">{
+  id:       'front_end_dti',
+  compute:  (profile, purchase) => ({
+    value:     (piti / income) * 100,
+    display:   '23.4%',
+    benchmark: '≤ 28%'
+  }),
+  evaluate: (result) =>
+    result.value &lt;= 28 ? 'pass'
+    : result.value &lt;= 32 ? 'stretch' : 'fail',
+  advice: {
+    pass:    'Within the 28% guideline.',
+    stretch: 'Slightly elevated — monitor.',
+    fail:    'Exceeds safe limits.'
+  }
+}</div>
+      </div>
+      <div class="card-indigo">
+        <h4 style="color:#a5b4fc;margin-bottom:8px;">Why config over hard-code?</h4>
+        <p style="color:rgba(255,255,255,.65);font-size:13px;line-height:1.6;">
+          Adding an Auto Loan or Business Equipment module requires only a new array of rule objects.
+          Zero UI changes — <code style="color:#c7d2fe;">RubricCard</code> and <code style="color:#c7d2fe;">ProFormaSummary</code> are fully generic consumers.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 7 — HUMAN vs. CLAUDE                        -->
+<!-- ══════════════════════════════════════════════════ -->
+<div class="slide bg-light" id="s7">
+  <div class="tag" style="color:var(--slate-400);">Human + AI Collaboration</div>
+  <h2 style="margin-bottom:6px;">What I did vs. what Claude did</h2>
+  <p class="muted" style="margin-bottom:24px;font-size:13px;">Strategic decisions stayed human. Execution was delegated to the AI.</p>
+
+  <div class="row" style="flex:1;gap:20px;">
+    <div class="col flex1" style="gap:10px;">
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--slate-400);margin-bottom:4px;">👤 My Contribution</div>
+      <div class="card flex1" style="border-left:4px solid var(--emerald);">
+        <div class="contrib-item">
+          <div class="contrib-icon">🎯</div>
+          <div><div class="contrib-title">Product Vision</div><div class="contrib-desc">Defined the 4-module scope, rubric architecture concept, and VA loan specialization requirement</div></div>
+        </div>
+        <div class="contrib-item">
+          <div class="contrib-icon">📐</div>
+          <div><div class="contrib-title">Requirements</div><div class="contrib-desc">Specified each financial rule (28/36 DTI, price-to-income, post-closing liquidity) and CFP-level accuracy targets</div></div>
+        </div>
+        <div class="contrib-item">
+          <div class="contrib-icon">🎨</div>
+          <div><div class="contrib-title">Design Direction</div><div class="contrib-desc">Specified Modern Light Mode aesthetic, glassmorphism cards, emerald/amber/crimson status system</div></div>
+        </div>
+        <div class="contrib-item">
+          <div class="contrib-icon">🔍</div>
+          <div><div class="contrib-title">Review &amp; Iteration</div><div class="contrib-desc">Caught redundant Total PITI display, requested post-tax income view, directed HOA addition, guided deployment</div></div>
+        </div>
+        <div class="contrib-item" style="margin-bottom:0;">
+          <div class="contrib-icon">🚀</div>
+          <div><div class="contrib-title">Deployment</div><div class="contrib-desc">Set up GitHub repo, connected Vercel, managed authentication and remote sync</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col flex1" style="gap:10px;">
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--slate-400);margin-bottom:4px;">🤖 Claude's Contribution</div>
+      <div class="card flex1" style="border-left:4px solid var(--indigo);">
+        <div class="contrib-item">
+          <div class="contrib-icon">⚙️</div>
+          <div><div class="contrib-title">Architecture Design</div><div class="contrib-desc">Proposed the JSON rubric contract, global FinancialProfile state design, and localStorage key schema</div></div>
+        </div>
+        <div class="contrib-item">
+          <div class="contrib-icon">📐</div>
+          <div><div class="contrib-title">Financial Math</div><div class="contrib-desc">Implemented all amortization formulas, VA funding fee tables, residual income calculations, Rent vs. Buy month-by-month simulation</div></div>
+        </div>
+        <div class="contrib-item">
+          <div class="contrib-icon">💻</div>
+          <div><div class="contrib-title">All 23 Source Files</div><div class="contrib-desc">Scaffolded the full Vite project, wrote every component, hook, utility, config file, and chart from scratch</div></div>
+        </div>
+        <div class="contrib-item">
+          <div class="contrib-icon">🐛</div>
+          <div><div class="contrib-title">Self-Debugging</div><div class="contrib-desc">Caught and fixed a stale lucide-react import on the first build without being prompted</div></div>
+        </div>
+        <div class="contrib-item" style="margin-bottom:0;">
+          <div class="contrib-icon">📚</div>
+          <div><div class="contrib-title">Documentation</div><div class="contrib-desc">Generated the technical whitepaper with equation derivations, regulatory citations, and market data sourcing</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 8 — DEV STATS                               -->
+<!-- ══════════════════════════════════════════════════ -->
+<div class="slide bg-indigo" id="s8">
+  <div class="tag" style="color:rgba(255,255,255,.4);">By the Numbers</div>
+  <h2 style="color:#fff;margin-bottom:28px;">Development statistics</h2>
+
+  <div class="row" style="gap:18px;margin-bottom:24px;">
+    <div class="card-dark flex1 col center" style="padding:24px 20px;">
+      <div class="stat col center"><span class="num" style="color:#a5b4fc;font-size:46px;">~3 hrs</span><span class="lbl" style="color:rgba(255,255,255,.4);">Total human time</span></div>
+      <p style="color:rgba(255,255,255,.4);font-size:11px;margin-top:10px;text-align:center;">Prompting, reviewing, directing, deploying</p>
+    </div>
+    <div class="card-dark flex1 col center" style="padding:24px 20px;">
+      <div class="stat col center"><span class="num" style="color:#6ee7b7;font-size:46px;">~80 hrs</span><span class="lbl" style="color:rgba(255,255,255,.4);">Traditional dev estimate</span></div>
+      <p style="color:rgba(255,255,255,.4);font-size:11px;margin-top:10px;text-align:center;">Senior dev: design + implement + test + document</p>
+    </div>
+    <div class="card-dark flex1 col center" style="padding:24px 20px;">
+      <div class="stat col center"><span class="num" style="color:#fcd34d;font-size:46px;">96%</span><span class="lbl" style="color:rgba(255,255,255,.4);">Time saved</span></div>
+      <p style="color:rgba(255,255,255,.4);font-size:11px;margin-top:10px;text-align:center;">3 hrs vs. ~80 hrs estimated traditional effort</p>
+    </div>
+  </div>
+
+  <div class="row" style="gap:18px;">
+    <div class="card-dark" style="flex:2;">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:14px;">Session Breakdown</div>
+      <div class="sess-row">
+        <span class="sess-title">Initial project scaffold</span>
+        <span class="sess-desc">22 files, full Vite+React setup, all components</span>
+        <span class="sess-tok">~35k tokens</span>
+      </div>
+      <div class="sess-row">
+        <span class="sess-title">HOA + Rent vs. Buy module</span>
+        <span class="sess-desc">Calculation engine, new module, chart, snapshot table</span>
+        <span class="sess-tok">~15k tokens</span>
+      </div>
+      <div class="sess-row">
+        <span class="sess-title">Pro-Forma refinements</span>
+        <span class="sess-desc">Post-tax income, editable living expenses, UI cleanup</span>
+        <span class="sess-tok">~5k tokens</span>
+      </div>
+      <div class="sess-row">
+        <span class="sess-title">Documentation</span>
+        <span class="sess-desc">Whitepaper + slides</span>
+        <span class="sess-tok">~8k tokens</span>
+      </div>
+    </div>
+
+    <div class="col flex1" style="gap:14px;">
+      <div class="card-dark">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:12px;">Token Estimate</div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+          <span style="font-size:13px;color:rgba(255,255,255,.5);">Input (context fed)</span>
+          <span style="font-size:13px;font-weight:700;color:#fff;">~35k</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+          <span style="font-size:13px;color:rgba(255,255,255,.5);">Output (generated)</span>
+          <span style="font-size:13px;font-weight:700;color:#fff;">~28k</span>
+        </div>
+        <div style="height:1px;background:rgba(255,255,255,.1);margin-bottom:8px;"></div>
+        <div style="display:flex;justify-content:space-between;">
+          <span style="font-size:14px;font-weight:700;color:rgba(255,255,255,.65);">Total</span>
+          <span style="font-size:16px;font-weight:900;color:#a5b4fc;">~63k tokens</span>
+        </div>
+      </div>
+      <div class="card-dark">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:12px;">Code Output</div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+          <span style="font-size:13px;color:rgba(255,255,255,.5);">Source files</span>
+          <span style="font-size:13px;font-weight:700;color:#fff;">23</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;">
+          <span style="font-size:13px;color:rgba(255,255,255,.5);">Lines of code</span>
+          <span style="font-size:13px;font-weight:700;color:#fff;">~6,100</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 9 — ROADMAP                                 -->
+<!-- ══════════════════════════════════════════════════ -->
+<div class="slide bg-light" id="s9">
+  <div class="tag" style="color:var(--slate-400);">Roadmap</div>
+  <h2 style="margin-bottom:28px;">What's next for Compass Finance</h2>
+
+  <div class="row" style="flex:1;gap:24px;">
+    <div class="col flex1">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--slate-400);margin-bottom:12px;">Near Term</div>
+      <div class="road-card">
+        <div class="road-emoji">🚗</div>
+        <div class="road-title">Auto / Vehicle Rubric</div>
+        <div class="road-desc">20% down rule, total transportation ≤ 15% of income, TCO with depreciation model. First demonstration of rubric engine extensibility.</div>
+      </div>
+      <div class="road-card">
+        <div class="road-emoji">📉</div>
+        <div class="road-title">Amortization Schedule</div>
+        <div class="road-desc">Interactive table showing principal vs. interest split and equity accumulation curve for each payment over the loan term.</div>
+      </div>
+      <div class="road-card">
+        <div class="road-emoji">📊</div>
+        <div class="road-title">Credit Score Optimizer</div>
+        <div class="road-desc">Shows which financial rubrics unlock at 680 / 720 / 740 / 780 FICO thresholds — actionable credit improvement roadmap.</div>
+      </div>
+    </div>
+    <div class="col flex1">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--slate-400);margin-bottom:12px;">Longer Term</div>
+      <div class="road-card green">
+        <div class="road-emoji">📄</div>
+        <div class="road-title">PDF Export</div>
+        <div class="road-desc">Pro-Forma summary and full analysis as a shareable, printable report — suitable for conversations with financial advisors or realtors.</div>
+      </div>
+      <div class="road-card green">
+        <div class="road-emoji">🌍</div>
+        <div class="road-title">Regional Calibration</div>
+        <div class="road-desc">Let users select state / metro to auto-adjust property tax rate, insurance rates, and VA residual income table region.</div>
+      </div>
+      <div class="road-card green">
+        <div class="road-emoji">🔗</div>
+        <div class="road-title">Live Rate Integration</div>
+        <div class="road-desc">Pull current mortgage rates from the Freddie Mac PMMS API or FRED so the sandbox always reflects today's market, not a manual input.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ -->
+<!-- SLIDE 10 — CLOSING                                -->
+<!-- ══════════════════════════════════════════════════ -->
+<div class="slide bg-indigo col center" id="s10">
+  <div style="width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,#6366f1,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:24px;">⚡</div>
+  <div class="tag" style="color:rgba(255,255,255,.4);">Thank you</div>
+  <h1 style="color:#fff;text-align:center;max-width:620px;margin-bottom:16px;">
+    Built with intent.<br/>Shipped with AI.
+  </h1>
+  <p style="color:rgba(255,255,255,.5);text-align:center;max-width:480px;font-size:15px;line-height:1.7;margin-bottom:44px;">
+    The best use of AI isn't replacing judgment — it's compressing the distance between an idea and a working product so you can validate faster.
+  </p>
+
+  <div class="row" style="gap:20px;margin-bottom:44px;">
+    <div class="card-dark" style="text-align:center;padding:18px 28px;">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:8px;">Live App</div>
+      <div style="font-size:13px;font-weight:700;color:#a5b4fc;">Deployed on Vercel</div>
+    </div>
+    <div class="card-dark" style="text-align:center;padding:18px 28px;">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:8px;">Source Code</div>
+      <div style="font-size:13px;font-weight:700;color:#a5b4fc;">github.com/nuobeiz/<br/>nuober_compass_finance</div>
+    </div>
+    <div class="card-dark" style="text-align:center;padding:18px 28px;">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:8px;">AI Model</div>
+      <div style="font-size:13px;font-weight:700;color:#a5b4fc;">Claude Sonnet 4.6<br/>via Claude Code</div>
+    </div>
+  </div>
+
+  <div style="font-size:12px;color:rgba(255,255,255,.2);">
+    Nuobei Zhang · 2026 · All financial calculations are for educational purposes only.
+  </div>
+</div>
+
+</div><!-- end deck -->
+
+<!-- Navigation -->
+<div class="progress-bar" id="dots"></div>
+<div class="nav">
+  <button onclick="go(-1)">←</button>
+  <button onclick="go(+1)">→</button>
+</div>
+<div class="counter" id="counter"></div>
+
+<script>
+  const slides = document.querySelectorAll('.slide')
+  const dotsEl = document.getElementById('dots')
+  const ctr    = document.getElementById('counter')
+  let cur = 0
+
+  slides.forEach((_, i) => {
+    const d = document.createElement('div')
+    d.className = 'dot' + (i === 0 ? ' on' : '')
+    d.onclick = () => show(i)
+    dotsEl.appendChild(d)
+  })
+
+  function show(n) {
+    slides[cur].classList.remove('active')
+    dotsEl.children[cur].classList.remove('on')
+    cur = (n + slides.length) % slides.length
+    slides[cur].classList.add('active')
+    dotsEl.children[cur].classList.add('on')
+    ctr.textContent = (cur + 1) + ' / ' + slides.length
+  }
+
+  function go(d) { show(cur + d) }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') go(+1)
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')                     go(-1)
+  })
+
+  show(0)
+</script>
+</body>
+</html>
